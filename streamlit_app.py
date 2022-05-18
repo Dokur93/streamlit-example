@@ -40,9 +40,10 @@ model=tree.fit(x,y)
 skor=np.round(model.score(x,y)*100,2)
 tahmin=[pclass,sex_male,age,sibsp,parch,fare,embarked_Q,embarked_S]
 sans=model.predict([tahmin])[0]
-if sans==1:
-    st.subheader(f"{skor} ihtimalle Yaşardınız!")
-    st.balloons()
-elif sans==0:
-    st.subheader(f"{skor} ihtimalle Ölürdünüz!")
-    st.image("https://www.belfasttelegraph.co.uk/news/northern-ireland/15fcc/40423573.ece/AUTOCROP/w1240h700/-09_new_24480000_I2.jpg")
+if st.sidebar.button("Hesapla"):
+    if sans==1:
+        st.subheader(f"{skor} ihtimalle Yaşardınız!")
+        st.balloons()
+    elif sans==0:
+        st.subheader(f"{skor} ihtimalle Ölürdünüz!")
+        st.image("https://www.belfasttelegraph.co.uk/news/northern-ireland/15fcc/40423573.ece/AUTOCROP/w1240h700/-09_new_24480000_I2.jpg")
