@@ -1,38 +1,64 @@
-from collections import namedtuple
-import altair as alt
-import math
-import pandas as pd
+
 import streamlit as st
 
-"""
-# Welcome to Streamlit!
+import seaborn as sns
 
-Edit `/streamlit_app.py` to customize this app to your heart's desire :heart:
+import pandas as pd
 
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
+import numpy as np
 
-In the meantime, below is an example of what you can do with just a few lines of code:
-"""
+from sklearn.tree import DecisionTreeClassifier
 
+from sklearn.tree import export_graphviz
 
-with st.echo(code_location='below'):
-    total_points = st.slider("Number of points in spiral", 1, 5000, 2000)
-    num_turns = st.slider("Number of turns in spiral", 1, 100, 9)
+import graphviz
 
-    Point = namedtuple('Point', 'x y')
-    data = []
+st.sidebar.image("https://pngimg.com/uploads/titanic/titanic_PNG9.png")
 
-    points_per_turn = total_points / num_turns
+titanic=sns.load_dataset('titanic')
 
-    for curr_point_num in range(total_points):
-        curr_turn, i = divmod(curr_point_num, points_per_turn)
-        angle = (curr_turn + 1) * 2 * math.pi * i / points_per_turn
-        radius = curr_point_num / total_points
-        x = radius * math.cos(angle)
-        y = radius * math.sin(angle)
-        data.append(Point(x, y))
+titanic=titanic.dropna()
 
-    st.altair_chart(alt.Chart(pd.DataFrame(data), height=500, width=500)
-        .mark_circle(color='#0068c9', opacity=0.5)
-        .encode(x='x:Q', y='y:Q'))
+titanic=titanic[["survived","pclass","sex","age","sibsp","parch","embarked"]]
+
+pclass=st.sidebar.number_input("pclass giriniz",step=1)
+
+sex=st.sidebar.selectbox("Cinsiyet",["male","female"])
+
+age=st.sidebar.number_input("Yaş",step=1)
+
+sibsp=st.sidebar.number_input("Gemideki Yakın Sayınız",step=1)
+
+parch=st.sidebar.number_input("Gemideki çocuklarınızın sayısı",step=1)
+
+embarked=st.sidebar.selectbox("Liman",["C","S","Q"])
+
+survived=0
+
+tahmin={"survived":survived,"pclass":pclass,"sex":sex,"age":age,"sibsp":sibsp,"parch":parch,"embarked":embarked}
+
+titanic=titanic.append(tahmin,ignore_index=True)
+
+titanic=pd.get_dummies(titanic,columns=["sex","embarked"],drop_first=True)
+
+y=titanic[["survived"]]
+
+x=titanic.drop("survived",axis=1)
+
+tree=DecisionTreeClassifier()
+
+model=tree.fit(x,y)
+
+st.write("Skorunuz",model.score(x,y))
+
+sonuc=model.predict(x.iloc[[-1]])[0]
+
+if sonuc==1:
+
+    st.balloons()
+
+    st.title("Yaşadınız")
+
+else:
+
+    st.title("Öldünüz")
